@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>방탈출 — 교과 미션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+/* =====================================================================
+   교과 맞춤형 방탈출 — 잠긴 금고 / 보안 단말 콘셉트
+   팔레트: 잉크 차콜 + 황동(브라스) + 양피지 + 해제(민트)/잠김(로즈)
+   ===================================================================== */
+:root{
+  --void:#15171C; --void2:#1B1E25; --panel:#21252E; --panel2:#272C36;
+  --line:#333A46; --fog:#9AA3B2; --fogdim:#6B7280;
+  --parch:#ECE4D0; --parch2:#E0D4B6; --inkp:#2B2823; --inkp2:#5A5444;
+  --brass:#E2A93B; --brassd:#A9781B; --brassglow:rgba(226,169,59,.55);
+  --mint:#56C99B; --rose:#E0635A;
+  --disp:'Black Han Sans','Pretendard',sans-serif;
+  --serif:'Gowun Batang',serif;
+  --ui:'Pretendard','Malgun Gothic',sans-serif;
+  --mono:ui-monospace,'SFMono-Regular','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--ui); color:var(--fog); background:var(--void);
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, rgba(226,169,59,.07), transparent 60%),
+    linear-gradient(transparent 31px, rgba(255,255,255,.022) 32px),
+    linear-gradient(90deg, transparent 31px, rgba(255,255,255,.022) 32px);
+  background-size:auto, 32px 32px, 32px 32px;
+  min-height:100%; display:flex; align-items:center; justify-content:center;
+  padding:24px; -webkit-tap-highlight-color:transparent;
+}
+.wrap{width:100%; max-width:880px}
+.screen{display:none}
+.screen.on{display:block; animation:fade .5s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---- 상단 라벨 ---- */
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.34em;color:var(--brass);text-transform:uppercase}
+
+/* ============================ 시작 화면 ============================ */
+.cover{text-align:center;padding:14px 0}
+.dial{
+  width:172px;height:172px;border-radius:50%;margin:0 auto 30px;position:relative;
+  background:repeating-conic-gradient(var(--brassd) 0 1.4deg, transparent 1.4deg 9deg);
+  box-shadow:0 0 0 7px #14161b, 0 0 0 9px #2a2f39, 0 22px 50px rgba(0,0,0,.55),
+             0 0 50px rgba(226,169,59,.12);
+  border:3px solid var(--brass); display:grid; place-items:center;
+  animation:turn 80s linear infinite;
+}
+@keyframes turn{to{transform:rotate(360deg)}}
+.dial::before{
+  content:'';position:absolute;inset:26px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%, #3a4150, #1d2129 70%);
+  box-shadow:inset 0 5px 16px rgba(0,0,0,.7), inset 0 0 0 2px #4a525f;
+}
+.dial::after{
+  content:'';position:absolute;left:50%;top:11px;width:6px;height:34px;border-radius:4px;
+  background:var(--brass);transform:translateX(-50%);box-shadow:0 0 12px var(--brassglow);
+}
+.dial b{position:relative;z-index:1;font-family:var(--disp);font-size:30px;color:var(--brass);
+  letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.cover h1{font-family:var(--disp);font-size:clamp(46px,9vw,78px);color:var(--parch);
+  line-height:.98;letter-spacing:.01em;margin:6px 0 14px}
+.cover h1 span{color:var(--brass)}
+.cover .lede{font-family:var(--serif);font-size:18px;color:var(--fog);max-width:440px;margin:0 auto;line-height:1.7}
+
+.enter{margin:34px auto 0;max-width:430px;background:var(--panel);border:1px solid var(--line);
+  border-radius:18px;padding:26px 26px 28px;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:var(--fog);margin-bottom:7px;letter-spacing:.02em}
+.field input{width:100%;font-family:var(--ui);font-size:17px;color:var(--parch);
+  background:var(--void2);border:1.5px solid var(--line);border-radius:11px;padding:13px 15px;outline:none;
+  transition:border-color .15s, box-shadow .15s}
+.field input:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(226,169,59,.18)}
+.field input::placeholder{color:var(--fogdim)}
+
+.btn{font-family:var(--ui);font-weight:700;font-size:17px;cursor:pointer;border:none;border-radius:11px;
+  padding:14px 22px;transition:transform .12s, filter .15s, background .15s}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.btn-go{width:100%;background:var(--brass);color:#231a07;letter-spacing:.02em;
+  box-shadow:0 8px 22px rgba(226,169,59,.28)}
+.btn-go:hover{filter:brightness(1.06)}
+.note{margin-top:14px;font-size:12.5px;color:var(--fogdim);text-align:center;line-height:1.6}
+
+/* ============================ 게임 화면 ============================ */
+.bar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.dots{display:flex;gap:9px;flex:1;min-width:0;flex-wrap:wrap}
+.dot{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-family:var(--mono);
+  font-size:13px;border:1.5px solid var(--line);color:var(--fogdim);background:var(--void2)}
+.dot.done{border-color:var(--mint);color:var(--mint);background:rgba(86,201,155,.10)}
+.dot.now{border-color:var(--brass);color:var(--brass);background:rgba(226,169,59,.12);
+  box-shadow:0 0 0 3px rgba(226,169,59,.14)}
+.gauge{display:flex;gap:9px}
+.pill{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
+  border-radius:999px;padding:7px 13px;font-family:var(--mono);font-size:14px;color:var(--parch)}
+.pill small{font-family:var(--ui);font-size:11px;color:var(--fogdim);letter-spacing:.04em}
+#wrong b{color:var(--rose)}
+
+.case{display:grid;grid-template-columns:1.25fr .9fr;gap:18px}
+@media(max-width:720px){.case{grid-template-columns:1fr}}
+
+/* 단서 카드 (양피지) */
+.clue{position:relative;background:linear-gradient(180deg,var(--parch),var(--parch2));
+  color:var(--inkp);border-radius:16px;padding:30px 30px 32px;overflow:hidden;
+  box-shadow:0 18px 44px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.06)}
+.clue::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:16px;
+  box-shadow:inset 0 0 70px rgba(120,96,40,.16)}
+.stamp{position:absolute;top:18px;right:-4px;transform:rotate(7deg);font-family:var(--disp);
+  font-size:18px;letter-spacing:.1em;color:#b34a43;border:3px solid #b34a43;border-radius:8px;
+  padding:4px 12px;opacity:.62}
+.clue .rm{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--brassd)}
+.clue h2{font-family:var(--disp);font-size:30px;line-height:1.12;margin:8px 0 16px;color:#23201a}
+.rule{height:2px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 8px,transparent 8px 14px);margin-bottom:16px}
+.scene{font-family:var(--serif);font-size:18px;line-height:1.85;white-space:pre-line;color:#2c2820}
+.evidence{display:none;max-width:100%;max-height:230px;border-radius:8px;border:5px solid #fff;
+  box-shadow:0 8px 22px rgba(0,0,0,.28);margin-bottom:16px;transform:rotate(-1deg)}
+.evidence.on{display:block}
+.hintbox{margin-top:18px;border-top:1px dashed rgba(0,0,0,.22);padding-top:14px;display:none}
+.hintbox.on{display:block}
+.hintbox p{font-family:var(--serif);font-size:15.5px;color:var(--inkp2);line-height:1.6;margin-bottom:6px}
+.hintbox p b{color:#9a6a12}
+
+/* 잠금 단말 */
+.lock{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px 22px 22px;
+  display:flex;flex-direction:column;box-shadow:0 18px 44px rgba(0,0,0,.4)}
+.lock .cap{font-family:var(--mono);font-size:11.5px;letter-spacing:.3em;color:var(--brass);text-transform:uppercase}
+.readout{margin-top:12px;background:#101216;border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 16px;display:flex;align-items:center;gap:12px;position:relative}
+.led{width:11px;height:11px;border-radius:50%;background:var(--rose);flex:0 0 auto;
+  box-shadow:0 0 10px var(--rose);transition:.2s}
+.readout.ok .led{background:var(--mint);box-shadow:0 0 12px var(--mint)}
+#code{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--parch);
+  font-family:var(--mono);font-size:24px;letter-spacing:.14em;text-transform:uppercase}
+#code::placeholder{color:#454c57;letter-spacing:.1em;text-transform:none;font-size:16px}
+.lock.shake{animation:shake .4s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(5px)}50%{transform:translateX(-7px)}}
+
+.acts{display:flex;gap:10px;margin-top:14px}
+.btn-submit{flex:1;background:var(--brass);color:#231a07}
+.btn-submit:hover{filter:brightness(1.06)}
+.btn-ghost{background:transparent;color:var(--fog);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--brass);color:var(--brass)}
+.status{margin-top:14px;min-height:20px;font-size:13.5px;color:var(--fogdim);line-height:1.5}
+.status.bad{color:var(--rose)}
+.status.good{color:var(--mint)}
+.lock .foot{margin-top:auto;padding-top:16px;font-size:12px;color:var(--fogdim);font-family:var(--mono);letter-spacing:.04em}
+
+/* ============================ 탈출 성공 ============================ */
+.clear{text-align:center;padding:10px 0}
+.clear .seal{width:104px;height:104px;border-radius:50%;margin:0 auto 22px;display:grid;place-items:center;
+  background:radial-gradient(circle at 40% 35%,#7be3bb,#2f9e76);color:#08291d;font-family:var(--disp);
+  font-size:42px;box-shadow:0 0 0 6px rgba(86,201,155,.18),0 16px 40px rgba(0,0,0,.45)}
+.clear h2{font-family:var(--disp);font-size:clamp(40px,8vw,64px);color:var(--parch);line-height:1;margin-bottom:8px}
+.clear h2 span{color:var(--mint)}
+.clear .sub{font-family:var(--serif);font-size:17px;color:var(--fog);margin-bottom:26px}
+.score{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 26px;min-width:140px}
+.stat .k{font-size:12px;color:var(--fogdim);letter-spacing:.06em;margin-bottom:6px}
+.stat .v{font-family:var(--mono);font-size:34px;color:var(--brass)}
+.clear .save{font-size:13px;color:var(--fogdim);margin-bottom:20px;min-height:18px}
+.clear .save.good{color:var(--mint)}
+.btn-again{background:var(--panel2);color:var(--parch);border:1.5px solid var(--line);padding:13px 30px}
+.btn-again:hover{border-color:var(--brass);color:var(--brass)}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001s !important}
+  .dial{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== 시작 화면 ===================== -->
+  <section id="start" class="screen on">
+    <div class="cover">
+      <div class="dial"><b>잠김</b></div>
+      <div class="eyebrow">교과 미션 · 방탈출</div>
+      <h1>잠긴 방을<br><span>풀고</span> 나가라</h1>
+      <p class="lede">단서를 읽고 정답(비밀번호)을 입력하면 다음 방이 열립니다.
+        모든 방을 통과하면 탈출 성공. 소요 시간과 오답 수가 기록됩니다.</p>
+
+      <div class="enter">
+        <div class="field">
+          <label for="sid">학번</label>
+          <input id="sid" inputmode="numeric" autocomplete="off" placeholder="예: 10325">
+        </div>
+        <div class="field">
+          <label for="name">이름</label>
+          <input id="name" autocomplete="off" placeholder="예: 홍길동">
+        </div>
+        <button class="btn btn-go" id="startBtn">입장하기</button>
+        <p class="note" id="startNote">문제를 불러오는 중…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 게임 화면 ===================== -->
+  <section id="game" class="screen">
+    <div class="bar">
+      <div class="dots" id="dots"></div>
+      <div class="gauge">
+        <div class="pill"><small>시간</small><span id="timer">00:00</span></div>
+        <div class="pill" id="wrong"><small>오답</small><b>0</b></div>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="clue">
+        <div class="stamp">잠김</div>
+        <div class="rm" id="roomTag">ROOM 01 / 03</div>
+        <h2 id="title">방 제목</h2>
+        <div class="rule"></div>
+        <img id="clueImg" class="evidence" alt="단서 사진">
+        <div class="scene" id="scene">단서</div>
+        <div class="hintbox" id="hintbox"></div>
+      </div>
+
+      <div class="lock" id="lock">
+        <div class="cap">비밀번호 입력</div>
+        <div class="readout" id="readout">
+          <span class="led"></span>
+          <input id="code" autocomplete="off" autocapitalize="characters" placeholder="여기에 입력 후 Enter">
+        </div>
+        <div class="acts">
+          <button class="btn btn-submit" id="submitBtn">입력</button>
+          <button class="btn btn-ghost" id="hintBtn">힌트</button>
+        </div>
+        <div class="status" id="status">단서를 읽고 비밀번호를 맞혀 보세요.</div>
+        <div class="foot" id="foot">SECURE TERMINAL · 대소문자·공백 무시</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 탈출 성공 ===================== -->
+  <section id="clear" class="screen">
+    <div class="clear">
+      <div class="seal">解</div>
+      <div class="eyebrow">MISSION COMPLETE</div>
+      <h2><span>탈출</span> 성공</h2>
+      <p class="sub" id="clearName">모든 방을 통과했습니다.</p>
+      <div class="score">
+        <div class="stat"><div class="k">소요 시간</div><div class="v" id="finalTime">00:00</div></div>
+        <div class="stat"><div class="k">오답 횟수</div><div class="v" id="finalWrong">0</div></div>
+      </div>
+      <div class="save" id="saveMsg"></div>
+      <button class="btn btn-again" id="againBtn">처음으로</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   ① 백엔드 연결 — 배포한 GAS 웹 앱 URL 을 붙여넣으세요.
+      비워 두면 아래 내장 예시 문제로 동작하고, 기록은 저장되지 않습니다.
+   ===================================================================== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxZkgs8pnKmQHQbrHtMOlNYfr-FZ2bewu01C2lkwUi0WJgGPHE05vjJ8q7fc0A7HB9Wlw/exec"; // 예: "https://script.google.com/macros/s/AKfyc.../exec"
+
+/* ② GAS 가 없을 때 쓰는 내장 예시 (역사·과학·영어) — 시트 '문제'와 같은 구조 */
+const SAMPLE = [
+  { stage:1, title:"사라진 광복의 해",
+    scene:"이 방의 주인은 한국이 일제로부터 해방된 해에 문을 잠갔다.\n네 자리 숫자를 입력하라.",
+    hint1:"8월 15일에 일어난 일.", hint2:"광복절을 떠올려 보자.", answer:"1945", photo:"" },
+  { stage:2, title:"끓는점의 방",
+    scene:"물이 끓기 시작하는 온도(℃)가 곧 비밀번호다. (1기압 기준)",
+    hint1:"얼음이 어는 온도의 정반대 끝.", hint2:"세 자리 숫자.", answer:"100", photo:"" },
+  { stage:3, title:"마지막 단어",
+    scene:"흩어진 글자를 바르게 배열하면 탈출구가 보인다.\n\nA  C  E  E  P  S",
+    hint1:"지금 네가 하려는 행동.", hint2:"동사이자 명사인 영어 단어.", answer:"ESCAPE", photo:"" }
+];
+
+/* ---------------- JSONP (GAS 호출, CORS 회피) ---------------- */
+function jsonp(params){
+  return new Promise((resolve, reject)=>{
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const q  = new URLSearchParams(Object.assign({}, params, {callback:cb})).toString();
+    const s  = document.createElement('script');
+    const done = (fn)=>{ try{ delete window[cb]; }catch(e){ window[cb]=undefined; } s.remove(); fn(); };
+    const timer = setTimeout(()=>done(()=>reject(new Error('시간 초과'))), 12000);
+    window[cb] = (data)=>{ clearTimeout(timer); done(()=>resolve(data)); };
+    s.onerror = ()=>{ clearTimeout(timer); done(()=>reject(new Error('연결 실패'))); };
+    s.src = GAS_URL + (GAS_URL.indexOf('?')>=0 ? '&' : '?') + q;
+    document.body.appendChild(s);
+  });
+}
+
+/* ---------------- 상태 ---------------- */
+let STAGES = [];
+let idx = 0, wrong = 0, started = 0, tick = null, hintLevel = 0, usingGAS = false;
+
+const $ = (id)=>document.getElementById(id);
+const norm = (s)=> String(s).trim().replace(/\s+/g,'').toLowerCase();
+
+/* ---- 구글 드라이브 사진: 주소에서 파일ID 추출 ---- */
+function driveFileId(u){
+  const s = String(u || '');
+  let m = s.match(/\/d\/([a-zA-Z0-9_-]{20,})/);   // .../d/ID  (lh3, /file/d/)
+  if(m) return m[1];
+  m = s.match(/[?&]id=([a-zA-Z0-9_-]{20,})/);      // ?id=ID, thumbnail?id=ID, uc?id=ID
+  if(m) return m[1];
+  return '';
+}
+/* 저장된 값을 <img>에 바로 쓸 수 있는 공개 직링크로 정리.
+   (옛날에 thumbnail?id= 형식으로 저장된 사진도 ID만 뽑아 lh3로 바꿔준다) */
+function photoUrl(u){
+  const id = driveFileId(u);
+  return id ? ('https://lh3.googleusercontent.com/d/' + id) : String(u || '');
+}
+function applyPhoto(img, u, onFail){
+  const src = photoUrl(u);
+  if(!src){ if(onFail) onFail(); return; }
+  img.onerror = ()=>{ img.onerror = null; if(onFail) onFail(); };
+  img.src = src;
+}
+
+/* ---------------- 문제 불러오기 ---------------- */
+async function loadProblems(){
+  if(!GAS_URL){
+    STAGES = SAMPLE; usingGAS = false;
+    $('startNote').textContent = "데모 모드 — 내장 예시 문제로 진행합니다 (기록 저장 안 됨).";
+    return;
+  }
+  try{
+    const res = await jsonp({action:'problems'});
+    if(res && res.ok && res.stages && res.stages.length){
+      STAGES = res.stages; usingGAS = true;
+      $('startNote').textContent = "문제를 불러왔습니다. 학번과 이름을 입력하세요.";
+    } else { throw new Error(res && res.error || '빈 문제'); }
+  }catch(err){
+    STAGES = SAMPLE; usingGAS = false;
+    $('startNote').textContent = "서버 연결에 실패해 내장 예시로 진행합니다. (" + err.message + ")";
+  }
+}
+
+/* ---------------- 화면 전환 ---------------- */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $(id).classList.add('on');
+}
+
+/* ---------------- 게임 시작 ---------------- */
+function startGame(){
+  const sid = $('sid').value.trim(), name = $('name').value.trim();
+  if(!name){ $('name').focus(); $('startNote').textContent = "이름을 입력해 주세요."; return; }
+  window.PLAYER = { sid, name };
+  idx = 0; wrong = 0; hintLevel = 0; started = Date.now();
+  buildDots();
+  show('game');
+  clearInterval(tick);
+  tick = setInterval(()=>{ $('timer').textContent = fmt(elapsed()); }, 500);
+  renderStage();
+}
+
+function elapsed(){ return Math.floor((Date.now()-started)/1000); }
+function fmt(sec){ return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0'); }
+
+function buildDots(){
+  $('dots').innerHTML = STAGES.map((_,i)=>`<div class="dot" data-i="${i}">${String(i+1).padStart(2,'0')}</div>`).join('');
+}
+function paintDots(){
+  [...$('dots').children].forEach((d,i)=>{
+    d.className = 'dot' + (i<idx?' done':'') + (i===idx?' now':'');
+  });
+}
+
+/* ---------------- 스테이지 렌더 ---------------- */
+function renderStage(){
+  const st = STAGES[idx];
+  $('roomTag').textContent = `ROOM ${String(idx+1).padStart(2,'0')} / ${String(STAGES.length).padStart(2,'0')}`;
+  $('title').textContent = st.title || `방 ${idx+1}`;
+  $('scene').textContent = st.scene || '';
+  const img = $('clueImg');
+  if(st.photo){ img.classList.add('on'); applyPhoto(img, st.photo, ()=>img.classList.remove('on')); }
+  else { img.onerror=null; img.classList.remove('on'); img.removeAttribute('src'); }
+  hintLevel = 0;
+  $('hintbox').className = 'hintbox';
+  $('hintbox').innerHTML = '';
+  const hasHint = (st.hint1 && st.hint1.trim()) || (st.hint2 && st.hint2.trim());
+  $('hintBtn').style.display = hasHint ? '' : 'none';
+  const code = $('code'); code.value=''; code.disabled=false;
+  $('submitBtn').disabled=false;
+  $('readout').classList.remove('ok');
+  setStatus('단서를 읽고 비밀번호를 맞혀 보세요.', '');
+  paintDots();
+  code.focus();
+}
+
+function setStatus(msg, kind){ const s=$('status'); s.textContent=msg; s.className='status'+(kind?(' '+kind):''); }
+
+/* ---------------- 정답 확인 ---------------- */
+function submit(){
+  const st = STAGES[idx];
+  const val = $('code').value;
+  if(!norm(val)){ $('code').focus(); return; }
+
+  if(norm(val) === norm(st.answer)){
+    $('readout').classList.add('ok');
+    setStatus('잠금 해제 — 다음 방으로 이동합니다.', 'good');
+    $('code').disabled = true; $('submitBtn').disabled = true;
+    setTimeout(()=>{
+      idx++;
+      if(idx >= STAGES.length) finish();
+      else renderStage();
+    }, 850);
+  }else{
+    wrong++;
+    $('wrong').querySelector('b').textContent = wrong;
+    const lock = $('lock');
+    lock.classList.remove('shake'); void lock.offsetWidth; lock.classList.add('shake');
+    setStatus('비밀번호가 맞지 않습니다. 단서를 다시 살펴보세요.', 'bad');
+    $('code').select();
+  }
+}
+
+/* ---------------- 힌트 ---------------- */
+function showHint(){
+  const st = STAGES[idx];
+  const box = $('hintbox');
+  if(hintLevel === 0 && st.hint1){
+    hintLevel = 1;
+    box.classList.add('on');
+    box.innerHTML = `<p><b>힌트 1.</b> ${escapeText(st.hint1)}</p>`;
+    if(!st.hint2) $('hintBtn').style.display='none';
+  }else if(st.hint2){
+    hintLevel = 2;
+    box.innerHTML += `<p><b>힌트 2.</b> ${escapeText(st.hint2)}</p>`;
+    $('hintBtn').style.display='none';
+  }
+}
+function escapeText(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+/* ---------------- 탈출 성공 ---------------- */
+function finish(){
+  clearInterval(tick);
+  const sec = elapsed();
+  $('finalTime').textContent = fmt(sec);
+  $('finalWrong').textContent = wrong;
+  $('clearName').textContent = `${window.PLAYER.name} 님, 모든 방을 통과했습니다.`;
+  show('clear');
+  saveRecord(sec);
+}
+
+function saveRecord(sec){
+  const msg = $('saveMsg');
+  if(!usingGAS){ msg.textContent = "데모 모드 — 기록은 저장되지 않았습니다."; msg.className='save'; return; }
+  msg.textContent = "기록 저장 중…"; msg.className='save';
+  jsonp({ action:'record', sid:window.PLAYER.sid, name:window.PLAYER.name, time:sec, wrong:wrong })
+    .then(r=>{
+      if(r && r.ok){ msg.textContent = "기록이 저장되었습니다."; msg.className='save good'; }
+      else throw new Error(r && r.error || '저장 실패');
+    })
+    .catch(err=>{ msg.textContent = "기록 저장에 실패했습니다. (" + err.message + ")"; msg.className='save'; });
+}
+
+/* ---------------- 이벤트 ---------------- */
+$('startBtn').addEventListener('click', startGame);
+$('name').addEventListener('keydown', e=>{ if(e.key==='Enter') startGame(); });
+$('sid').addEventListener('keydown', e=>{ if(e.key==='Enter') $('name').focus(); });
+$('submitBtn').addEventListener('click', submit);
+$('code').addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+$('hintBtn').addEventListener('click', showHint);
+$('againBtn').addEventListener('click', ()=>{ show('start'); $('code').value=''; });
+
+/* ---------------- 시작 ---------------- */
+loadProblems();
+</script>
+</body>
+</html>

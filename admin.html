@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>방탈출 — 문제 관리(교사용)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+:root{
+  --void:#15171C; --void2:#1B1E25; --panel:#21252E; --panel2:#272C36;
+  --line:#333A46; --fog:#9AA3B2; --fogdim:#6B7280;
+  --parch:#ECE4D0; --brass:#E2A93B; --brassd:#A9781B;
+  --mint:#56C99B; --rose:#E0635A;
+  --disp:'Black Han Sans','Pretendard',sans-serif;
+  --ui:'Pretendard','Malgun Gothic',sans-serif;
+  --mono:ui-monospace,'SFMono-Regular','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--ui);color:var(--fog);background:var(--void);
+  background-image:radial-gradient(120% 80% at 50% -10%, rgba(226,169,59,.06), transparent 60%);
+  min-height:100%;padding:28px 18px;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:840px;margin:0 auto}
+.screen{display:none}.screen.on{display:block;animation:fade .4s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.32em;color:var(--brass);text-transform:uppercase}
+
+/* 공통 입력/버튼 */
+input,textarea{width:100%;font-family:var(--ui);font-size:15px;color:var(--parch);
+  background:var(--void2);border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;outline:none;
+  transition:border-color .15s, box-shadow .15s}
+textarea{resize:vertical;min-height:96px;line-height:1.6}
+input:focus,textarea:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(226,169,59,.16)}
+input::placeholder,textarea::placeholder{color:var(--fogdim)}
+label{display:block;font-size:13px;color:var(--fog);margin:0 0 6px 2px}
+.btn{font-family:var(--ui);font-weight:700;font-size:15px;cursor:pointer;border:none;border-radius:10px;
+  padding:11px 18px;transition:transform .1s, filter .15s, border-color .15s, color .15s}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.btn-pri{background:var(--brass);color:#231a07}.btn-pri:hover{filter:brightness(1.06)}
+.btn-ghost{background:transparent;color:var(--fog);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--brass);color:var(--brass)}
+.btn-danger{background:transparent;color:var(--rose);border:1.5px solid rgba(224,99,90,.4)}
+.btn-danger:hover{background:rgba(224,99,90,.12);border-color:var(--rose)}
+.btn-sm{padding:7px 13px;font-size:13px;border-radius:8px}
+
+/* 로그인 */
+.login{max-width:380px;margin:8vh auto 0;text-align:center}
+.login .lock{width:62px;height:62px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;
+  background:var(--panel);border:2px solid var(--brass);color:var(--brass);font-family:var(--disp);font-size:26px}
+.login h1{font-family:var(--disp);font-size:34px;color:var(--parch);margin:6px 0 6px}
+.login p{font-size:14px;color:var(--fogdim);line-height:1.6;margin-bottom:22px}
+.login .row{display:flex;gap:10px;margin-top:14px}
+.msg{margin-top:14px;font-size:13px;min-height:18px;color:var(--fogdim);white-space:pre-line;line-height:1.55}
+.msg.bad{color:var(--rose)}.msg.good{color:var(--mint)}
+
+/* 패널 헤더 */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.top h1{font-family:var(--disp);font-size:30px;color:var(--parch);line-height:1}
+.top .sub{font-size:13px;color:var(--fogdim);margin-top:6px}
+.top .acts{display:flex;gap:9px}
+
+/* 편집 카드 */
+.editor{display:none;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:22px;margin-bottom:22px;box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.editor.on{display:block;animation:fade .3s ease both}
+.editor h2{font-family:var(--disp);font-size:20px;color:var(--brass);margin-bottom:16px}
+.grid{display:grid;grid-template-columns:120px 1fr;gap:14px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.editor .field{margin-bottom:14px}
+.editor .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.editor .two{grid-template-columns:1fr}}
+.editor .foot{display:flex;gap:10px;margin-top:6px}
+.hintnote{font-size:12px;color:var(--fogdim);margin:8px 2px 12px;line-height:1.5}
+.photo{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px}
+.prev{display:none;width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--void2)}
+.prev.on{display:block}
+.photo-acts{display:flex;flex-direction:column;gap:8px}
+.filebtn{display:inline-flex;align-items:center;cursor:pointer}
+.thumb{width:46px;height:46px;border-radius:9px;object-fit:cover;border:1px solid var(--line);flex:0 0 auto}
+
+/* 목록 */
+.count{font-family:var(--mono);font-size:13px;color:var(--fog);margin-bottom:12px}
+.list{display:flex;flex-direction:column;gap:11px}
+.item{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
+  border-radius:13px;padding:14px 16px}
+.item .no{width:40px;height:40px;flex:0 0 auto;border-radius:9px;display:grid;place-items:center;
+  font-family:var(--mono);font-size:15px;color:var(--brass);background:rgba(226,169,59,.10);border:1px solid rgba(226,169,59,.3)}
+.item .body{flex:1;min-width:0}
+.item .t{font-weight:700;color:var(--parch);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .a{font-family:var(--mono);font-size:12.5px;color:var(--mint);margin-top:3px}
+.item .a span{color:var(--fogdim)}
+.item .ops{display:flex;gap:8px;flex:0 0 auto}
+.empty{text-align:center;color:var(--fogdim);padding:40px 0;font-size:14px;line-height:1.7}
+
+.bannernote{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  font-size:13px;color:var(--fog);line-height:1.6;margin-top:20px}
+.bannernote b{color:var(--brass)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 로그인 ===== -->
+  <section id="login" class="screen on">
+    <div class="login">
+      <div class="lock">🔐</div>
+      <div class="eyebrow">교사용 · 문제 관리</div>
+      <h1>관리자 확인</h1>
+      <p>관리자 비밀번호를 입력하면 문제를 추가·수정·삭제할 수 있어요.</p>
+      <input id="pin" type="password" inputmode="numeric" placeholder="관리자 비밀번호" autocomplete="off">
+      <div class="row">
+        <button class="btn btn-pri" id="loginBtn" style="flex:1">들어가기</button>
+      </div>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+  </section>
+
+  <!-- ===== 관리 패널 ===== -->
+  <section id="panel" class="screen">
+    <div class="top">
+      <div>
+        <h1>문제 관리</h1>
+        <div class="sub">바꾼 내용은 구글 시트에 저장되어, 게임을 새로고침하면 바로 반영됩니다.</div>
+      </div>
+      <div class="acts">
+        <button class="btn btn-ghost btn-sm" id="reloadBtn">새로고침</button>
+        <button class="btn btn-pri btn-sm" id="newBtn">+ 새 문제</button>
+      </div>
+    </div>
+
+    <!-- 편집 카드 -->
+    <div class="editor" id="editor">
+      <h2 id="editorTitle">새 문제</h2>
+      <input type="hidden" id="e_row">
+      <div class="grid">
+        <div class="field">
+          <label for="e_stage">스테이지</label>
+          <input id="e_stage" inputmode="numeric" placeholder="예: 1">
+        </div>
+        <div class="field">
+          <label for="e_title">제목</label>
+          <input id="e_title" placeholder="예: 사라진 광복의 해">
+        </div>
+      </div>
+      <div class="field">
+        <label for="e_scene">상황 · 단서</label>
+        <textarea id="e_scene" placeholder="학생에게 보여줄 상황과 단서. 줄바꿈하면 게임에서도 줄이 나뉩니다."></textarea>
+      </div>
+      <div class="two">
+        <div class="field"><label for="e_hint1">힌트 1 (선택)</label><input id="e_hint1" placeholder="첫 번째 힌트"></div>
+        <div class="field"><label for="e_hint2">힌트 2 (선택)</label><input id="e_hint2" placeholder="두 번째 힌트"></div>
+      </div>
+      <div class="hintnote">힌트를 비워 두면 게임에서 힌트 버튼이 나타나지 않습니다.</div>
+      <div class="field">
+        <label for="e_answer">정답(비밀번호)</label>
+        <input id="e_answer" placeholder="예: 1945 또는 ESCAPE — 대소문자·공백은 무시됩니다">
+      </div>
+      <div class="field">
+        <label>사진 (선택)</label>
+        <div class="photo">
+          <img id="e_preview" class="prev" alt="">
+          <div class="photo-acts">
+            <label class="btn btn-ghost btn-sm filebtn">사진 선택<input type="file" id="e_file" accept="image/*" hidden></label>
+            <button type="button" class="btn btn-danger btn-sm" id="e_photoRemove">사진 제거</button>
+          </div>
+        </div>
+        <div class="hintnote">JPG·PNG 등 이미지. 큰 사진은 자동으로 줄여서 올립니다. 저장을 누를 때 함께 업로드됩니다.</div>
+      </div>
+      <div class="foot">
+        <button class="btn btn-pri" id="saveBtn">저장</button>
+        <button class="btn btn-ghost" id="cancelBtn">취소</button>
+        <div class="msg" id="editMsg" style="align-self:center;margin:0 0 0 6px"></div>
+      </div>
+    </div>
+
+    <div class="count" id="count">문제 불러오는 중…</div>
+    <div class="list" id="list"></div>
+
+    <div class="bannernote">
+      <b>정답이 보이는 점</b> — 이 페이지와 게임은 정답을 함께 다루므로, 링크를 학생과 공유하지 마세요.
+      관리자 비밀번호는 <b>code.gs</b>의 <b>ADMIN_PIN</b> 값에서 바꿀 수 있습니다.
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   배포한 GAS 웹 앱 URL — index.html 에 넣은 것과 같은 값을 넣으세요.
+   ===================================================================== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxZkgs8pnKmQHQbrHtMOlNYfr-FZ2bewu01C2lkwUi0WJgGPHE05vjJ8q7fc0A7HB9Wlw/exec"; // 예: "https://script.google.com/macros/s/AKfyc.../exec"
+
+let PIN = "";
+let ITEMS = [];
+let pendingFile = null;     // 새로 고른 사진 파일
+let pendingRemove = false;  // 사진 제거 요청
+
+const $ = (id)=>document.getElementById(id);
+
+/* ---- 구글 드라이브 사진: 주소에서 파일ID 추출 ---- */
+function driveFileId(u){
+  const s = String(u || '');
+  let m = s.match(/\/d\/([a-zA-Z0-9_-]{20,})/);   // .../d/ID  (lh3, /file/d/)
+  if(m) return m[1];
+  m = s.match(/[?&]id=([a-zA-Z0-9_-]{20,})/);      // ?id=ID, thumbnail?id=ID, uc?id=ID
+  if(m) return m[1];
+  return '';
+}
+/* 저장된 값을 <img>에 바로 쓸 수 있는 공개 직링크로 정리 */
+function photoUrl(u){
+  const id = driveFileId(u);
+  return id ? ('https://lh3.googleusercontent.com/d/' + id) : String(u || '');
+}
+function applyPhoto(img, u, onFail){
+  const src = photoUrl(u);
+  if(!src){ if(onFail) onFail(); return; }
+  img.onerror = ()=>{ img.onerror = null; if(onFail) onFail(); };
+  img.src = src;
+}
+
+/* JSONP (CORS 회피) */
+function jsonp(params){
+  return new Promise((resolve, reject)=>{
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const q  = new URLSearchParams(Object.assign({}, params, {callback:cb})).toString();
+    const s  = document.createElement('script');
+    const done = (fn)=>{ try{ delete window[cb]; }catch(e){ window[cb]=undefined; } s.remove(); fn(); };
+    const timer = setTimeout(()=>done(()=>reject(new Error('시간 초과'))), 15000);
+    window[cb] = (data)=>{ clearTimeout(timer); done(()=>resolve(data)); };
+    s.onerror = ()=>{ clearTimeout(timer); done(()=>reject(new Error('연결 실패'))); };
+    s.src = GAS_URL + (GAS_URL.indexOf('?')>=0 ? '&' : '?') + q;
+    document.body.appendChild(s);
+  });
+}
+
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); }
+function setMsg(el, text, kind){ el.textContent=text||''; el.className='msg'+(kind?(' '+kind):''); }
+
+/* 로그인 → 목록 불러오기 */
+async function login(){
+  if(!GAS_URL){ setMsg($('loginMsg'),'GAS_URL 이 비어 있습니다. code.gs 배포 URL을 먼저 넣어 주세요.','bad'); return; }
+  PIN = $('pin').value.trim();
+  if(!PIN){ $('pin').focus(); return; }
+  setMsg($('loginMsg'),'확인 중…','');
+  try{
+    const res = await jsonp({action:'admin_list', pin:PIN});
+    if(res && res.ok){ ITEMS = res.stages||[]; show('panel'); render(); }
+    else { setMsg($('loginMsg'), res && res.error || '들어갈 수 없습니다.', 'bad'); }
+  }catch(err){ setMsg($('loginMsg'),'연결 실패: '+err.message,'bad'); }
+}
+
+/* 목록 다시 불러오기 */
+async function reload(){
+  $('count').textContent = '불러오는 중…';
+  try{
+    const res = await jsonp({action:'admin_list', pin:PIN});
+    if(res && res.ok){ ITEMS = res.stages||[]; render(); }
+    else { $('count').textContent = res && res.error || '불러오기 실패'; }
+  }catch(err){ $('count').textContent = '연결 실패: '+err.message; }
+}
+
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function render(){
+  $('count').textContent = '등록된 문제 ' + ITEMS.length + '개';
+  if(ITEMS.length===0){
+    $('list').innerHTML = '<div class="empty">아직 문제가 없습니다.<br>오른쪽 위 [+ 새 문제]로 첫 문제를 만들어 보세요.</div>';
+    return;
+  }
+  $('list').innerHTML = ITEMS.map((it)=>`
+    <div class="item">
+      ${it.photo?`<img class="thumb" data-photo="${esc(it.photo)}" alt="">`:''}
+      <div class="no">${esc(String(it.stage||'·'))}</div>
+      <div class="body">
+        <div class="t">${esc(it.title||'(제목 없음)')}</div>
+        <div class="a"><span>정답</span> ${esc(it.answer||'(비어 있음)')}</div>
+      </div>
+      <div class="ops">
+        <button class="btn btn-ghost btn-sm" data-edit="${it.row}">수정</button>
+        <button class="btn btn-danger btn-sm" data-del="${it.row}">삭제</button>
+      </div>
+    </div>`).join('');
+
+  // 썸네일은 드라이브 주소가 막히면 다른 형식으로 자동 재시도, 끝내 실패하면 숨김
+  $('list').querySelectorAll('img.thumb[data-photo]').forEach((im)=>{
+    applyPhoto(im, im.getAttribute('data-photo'), ()=>{ im.style.display = 'none'; });
+  });
+}
+
+/* 편집 카드 열기/닫기 */
+function openEditor(item){
+  $('editorTitle').textContent = item ? '문제 수정' : '새 문제';
+  $('e_row').value   = item ? item.row : '';
+  $('e_stage').value = item ? (item.stage||'') : nextStage();
+  $('e_title').value = item ? (item.title||'') : '';
+  $('e_scene').value = item ? (item.scene||'') : '';
+  $('e_hint1').value = item ? (item.hint1||'') : '';
+  $('e_hint2').value = item ? (item.hint2||'') : '';
+  $('e_answer').value= item ? (item.answer||'') : '';
+  pendingFile = null; pendingRemove = false;
+  $('e_file').value = '';
+  setPreview(item && item.photo ? item.photo : '');
+  setMsg($('editMsg'),'','');
+  $('editor').classList.add('on');
+  $('editor').scrollIntoView({behavior:'smooth', block:'start'});
+  $('e_title').focus();
+}
+function closeEditor(){ $('editor').classList.remove('on'); }
+function nextStage(){ let m=0; ITEMS.forEach(it=>{ const n=Number(it.stage); if(n>m) m=n; }); return m+1; }
+
+/* 저장 */
+async function save(){
+  const stage = $('e_stage').value.trim();
+  const answer= $('e_answer').value.trim();
+  if(!stage){ setMsg($('editMsg'),'스테이지 번호를 입력하세요.','bad'); $('e_stage').focus(); return; }
+  if(!answer){ setMsg($('editMsg'),'정답을 입력하세요.','bad'); $('e_answer').focus(); return; }
+  setMsg($('editMsg'),'저장 중…','');
+  try{
+    const res = await jsonp({
+      action:'admin_save', pin:PIN, row:$('e_row').value,
+      stage:stage, title:$('e_title').value, scene:$('e_scene').value,
+      hint1:$('e_hint1').value, hint2:$('e_hint2').value, answer:answer
+    });
+    if(!(res && res.ok)){ setMsg($('editMsg'), res && res.error || '저장 실패','bad'); return; }
+    const row = res.row;
+    if(pendingFile && row){
+      setMsg($('editMsg'),'사진 올리는 중… (이미지 크기에 따라 몇 초 걸려요)','');
+      const pr = await uploadPhoto(row, pendingFile);
+      if(!(pr && pr.ok)){
+        setMsg($('editMsg'),
+          '⚠ 사진 저장 실패: ' + ((pr && pr.error) || '') + '\n' +
+          '글자 내용은 저장됐습니다. code.gs를 [새 버전]으로 재배포했는지 확인하세요.', 'bad');
+        await reload();
+        return;   // 에디터를 닫지 않아 다시 시도할 수 있게 둠
+      }
+    } else if(pendingRemove && row){
+      await jsonp({action:'admin_photo', pin:PIN, row:row, url:''});
+    }
+    closeEditor();
+    await reload();
+  }catch(err){ setMsg($('editMsg'),'연결 실패: '+err.message,'bad'); }
+}
+
+/* 사진 미리보기 */
+function setPreview(src){
+  const img = $('e_preview');
+  if(src){ img.classList.add('on'); applyPhoto(img, src, ()=>img.classList.remove('on')); }
+  else { img.onerror=null; img.classList.remove('on'); img.removeAttribute('src'); }
+}
+
+/* 이미지 줄이기 → dataURL(JPEG). 긴 변 기준 max 픽셀 */
+function shrinkImage(file, max){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      let {width:w, height:h} = img;
+      const scale = Math.min(1, max / Math.max(w, h));
+      w = Math.round(w*scale); h = Math.round(h*scale);
+      const c = document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(c.toDataURL('image/jpeg', 0.85));
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = ()=>reject(new Error('이미지를 읽을 수 없습니다.'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/* 드라이브 업로드.
+   - 작동 검증된 방식: no-cors 없이 평범한 fetch(POST, text/plain)로 보내고
+     응답(res.json())을 직접 읽어 성공/실패를 바로 안다.
+   - 혹시 응답을 못 읽으면(브라우저 환경 차이) admin_list 로 재확인한다.
+   - 반환: {ok:true, url} 또는 {ok:false, error} */
+async function uploadPhoto(row, file){
+  const dataUrl = await shrinkImage(file, 1600);
+  try{
+    const res = await fetch(GAS_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},   // 프리플라이트 회피 (no-cors 아님!)
+      body: JSON.stringify({ action:'upload', pin:PIN, row:row, name:file.name, mime:'image/jpeg', data:dataUrl })
+    });
+    const data = await res.json();
+    if(data && data.ok) return data;
+    return { ok:false, error:(data && data.error) || '알 수 없는 오류' };
+  }catch(e){
+    // 응답을 못 읽었을 뿐 실제로 저장됐을 수 있음 → 시트에서 재확인
+    for(let i=0; i<5; i++){
+      await sleep(900);
+      try{
+        const chk = await jsonp({action:'admin_list', pin:PIN});
+        if(chk && chk.ok){
+          const it = (chk.stages||[]).find(x=>String(x.row)===String(row));
+          if(it && it.photo) return { ok:true, url:it.photo };
+        }
+      }catch(_){}
+    }
+    return { ok:false, error:'응답을 확인하지 못했습니다.' };
+  }
+}
+
+/* 삭제 */
+async function del(row, title){
+  if(!confirm('"'+(title||'이 문제')+'" 을(를) 삭제할까요? 되돌릴 수 없습니다.')) return;
+  try{
+    const res = await jsonp({action:'admin_delete', pin:PIN, row:row});
+    if(res && res.ok) await reload();
+    else alert('삭제 실패: ' + (res && res.error || ''));
+  }catch(err){ alert('연결 실패: '+err.message); }
+}
+
+/* 이벤트 */
+$('loginBtn').addEventListener('click', login);
+$('pin').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
+$('reloadBtn').addEventListener('click', reload);
+$('newBtn').addEventListener('click', ()=>openEditor(null));
+$('saveBtn').addEventListener('click', save);
+$('cancelBtn').addEventListener('click', closeEditor);
+$('e_file').addEventListener('change', (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  pendingFile = file; pendingRemove = false;
+  setPreview(URL.createObjectURL(file));
+});
+$('e_photoRemove').addEventListener('click', ()=>{
+  pendingFile = null; pendingRemove = true;
+  $('e_file').value = '';
+  setPreview('');
+});
+$('list').addEventListener('click', (e)=>{
+  const ed = e.target.getAttribute('data-edit');
+  const dl = e.target.getAttribute('data-del');
+  if(ed){ const it = ITEMS.find(x=>String(x.row)===ed); if(it) openEditor(it); }
+  if(dl){ const it = ITEMS.find(x=>String(x.row)===dl); del(Number(dl), it && it.title); }
+});
+
+if(!GAS_URL){ setMsg($('loginMsg'),'GAS_URL 이 비어 있습니다. code.gs 배포 URL을 먼저 넣어 주세요.','bad'); }
+</script>
+</body>
+</html>
